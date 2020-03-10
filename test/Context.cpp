@@ -24,7 +24,6 @@
 #include "libdnf/conf/ConfigParser.hpp"
 #include "libdnf/conf/ConfigRepo.hpp"
 #include "libdnf/dnf-context.h" // for find_base_arch
-#include "libdnf/repo/Repo.hpp"
 
 #include <glob.h>
 #include <iostream>
@@ -79,13 +78,9 @@ void Context::readRepoConfigs()
 {
     for (auto reposDir : cfgMain.reposdir().getValue()) {
         const std::string pattern = reposDir + "/*.repo";
-        std::cout << "XXX reposdir: " << reposDir << std::endl;
-        std::cout << "XXX pattern: " << pattern << std::endl;
-
         glob_t globResult;
         glob(pattern.c_str(), GLOB_MARK, NULL, &globResult);
         for (size_t i = 0; i < globResult.gl_pathc; ++i) {
-            std::cout << "XXX file: " << globResult.gl_pathv[i] << std::endl;
             std::unique_ptr<libdnf::ConfigParser> repo_parser(new libdnf::ConfigParser);
             repo_parser->setSubstitutions(substitutions);
             repo_parser->read(globResult.gl_pathv[i]);
@@ -93,7 +88,6 @@ void Context::readRepoConfigs()
             for (const auto & cfgParserDataIter : cfgParserData) {
                 if (cfgParserDataIter.first != "main") {
                     auto section = cfgParserDataIter.first;
-                    std::cout << "XXX section: " << section << std::endl;
                     std::unique_ptr<libdnf::ConfigRepo> cfgRepo(new libdnf::ConfigRepo(cfgMain));
                     auto optBinds = cfgRepo->optBinds();
                     for (const auto &opt : cfgParserDataIter.second) {
@@ -107,10 +101,6 @@ void Context::readRepoConfigs()
                                 repo_parser->getSubstitutedValue(section, opt.first));
                         }
                     }
-                    std::cout << "XXX name: " << cfgRepo->name().getValue() << std::endl;
-                    for (auto & bu : cfgRepo->baseurl().getValue()) {
-                        std::cout << "XXX baseurl: " << bu << std::endl;
-                    }
                     std::unique_ptr<libdnf::Repo> repo(new libdnf::Repo(section, std::move(cfgRepo)));
                     repos.push_back(std::move(repo));
                 }
@@ -118,6 +108,5 @@ void Context::readRepoConfigs()
             cfgRepoParsers.push_back(std::move(repo_parser));
         }
         globfree(&globResult);
-        std::cout << "XXX ----" << std::endl;
     }
 }

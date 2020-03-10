@@ -19,17 +19,37 @@
  */
 
 #include "Context.hpp"
+#include "Repository.hpp"
 
 #include <iostream>
 #include <sdbus-c++/sdbus-c++.h>
 
 
-int main(int argc, char **argv)
+int xmain(int argc, char **argv)
 {
     Context ctx;
 
     ctx.configure();
 
     std::cout << "XXX installonly_limit: " << ctx.cfgMain.installonly_limit().getValue() << std::endl;
+    for (auto &r: ctx.repos) {
+        std::cout << "XXX repo id: " << r->getId() << std::endl;
+    }
     return 0;
 }
+
+int main(int argc, char *argv[])
+{
+    // Create D-Bus connection to the system bus and requests name on it.
+    const char* serviceName = "org.rpm.dnf.Repository1";
+    auto connection = sdbus::createSystemBusConnection(serviceName);
+
+    // Create concatenator D-Bus object.
+    const char* objectPath = "/org/rpm/dnf/Repository1";
+    Repository1 repository1(*connection, objectPath);
+
+    // Run the loop on the connection.
+    connection->enterEventLoop();
+    return 0;
+}
+
