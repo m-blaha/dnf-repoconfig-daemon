@@ -21,8 +21,9 @@
 #ifndef DNFDAEMON_REPOSITORY_HPP
 #define DNFDAEMON_REPOSITORY_HPP
 
-#include <sdbus-c++/sdbus-c++.h>
 #include "server-glue.hpp"
+
+#include <sdbus-c++/sdbus-c++.h>
 
 class Repository1 : public sdbus::AdaptorInterfaces<org::rpm::dnf::Repository1_adaptor /*, more adaptor classes if there are more interfaces*/>
 {
@@ -38,8 +39,11 @@ public:
         unregisterAdaptor();
     }
 
-protected:
-    std::vector<std::string> List(const std::string& id) override;
+private:
+    std::vector<std::map<std::string, sdbus::Variant>> list() override;
+    std::map<std::string, sdbus::Variant> info(const std::string& id) override;
+    std::vector<std::string> enable(const std::vector<std::string>& ids) override;
+    std::vector<std::string> disable(const std::vector<std::string>& ids) override;
 };
 
 #endif

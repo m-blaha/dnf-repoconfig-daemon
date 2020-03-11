@@ -18,18 +18,39 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <sdbus-c++/sdbus-c++.h>
 #include "server-glue.hpp"
 #include "repository.hpp"
 #include "../repository/context.hpp"
 
-std::vector<std::string> Repository1::List(const std::string& id)
+#include <sdbus-c++/sdbus-c++.h>
+
+std::vector<std::map<std::string, sdbus::Variant>> Repository1::list()
 {
     Context ctx;
     ctx.configure();
-    std::vector<std::string> out;
+    std::vector<std::map<std::string, sdbus::Variant>> out;
     for (auto &repo: ctx.repos) {
-        out.push_back(repo->getId());
+        std::map<std::string, sdbus::Variant> repoitem;
+        repoitem.emplace(std::make_pair(std::string("id"), repo->getId()));
+        out.push_back(repoitem);
     }
+    return out;
+}
+
+std::map<std::string, sdbus::Variant> Repository1::info(const std::string& id)
+{
+    std::map<std::string, sdbus::Variant> out;
+    return out;
+}
+
+std::vector<std::string> Repository1::enable(const std::vector<std::string>& ids)
+{
+    std::vector<std::string> out;
+    return out;
+}
+
+std::vector<std::string> Repository1::disable(const std::vector<std::string>& ids)
+{
+    std::vector<std::string> out;
     return out;
 }

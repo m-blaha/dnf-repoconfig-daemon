@@ -31,9 +31,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 US
         @id: id of the repository
         @repos: List of the repositories
         -->
-        <method name="List">
+        <method name="list">
+            <arg type="aa{sv}" name="repos" direction="out"/>
+        </method>
+        <method name="info">
             <arg type="s" name="id" direction="in"/>
-            <arg type="as" name="repos" direction="out"/>
+            <arg type="a{sv}" name="repos" direction="out"/>
+        </method>
+        <method name="enable">
+            <arg type="as" name="ids" direction="in"/>
+            <arg type="as" name="enabled_ids" direction="out"/>
+        </method>
+        <method name="disable">
+            <arg type="as" name="ids" direction="in"/>
+            <arg type="as" name="disabled_ids" direction="out"/>
         </method>
     </interface>
 </node>
