@@ -20,8 +20,8 @@
 
 #include <sdbus-c++/sdbus-c++.h>
 #include "server-glue.hpp"
-#include "Repository.hpp"
-#include "Context.hpp"
+#include "repository.hpp"
+#include "../repository/context.hpp"
 
 std::vector<std::string> Repository1::List(const std::string& id)
 {

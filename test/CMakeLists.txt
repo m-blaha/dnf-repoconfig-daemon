@@ -18,9 +18,10 @@ add_definitions(-DLIBDNF_UNSTABLE_API)
 
 SET(DAEMON_SRCS
     main.cpp
-    Context.cpp
-    Repository.cpp
 )
+
+add_subdirectory(repository)
+add_subdirectory(dbus)
 
 add_executable(daemontest ${DAEMON_SRCS})
 
