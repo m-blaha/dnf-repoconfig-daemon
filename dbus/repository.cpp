@@ -39,7 +39,15 @@ std::vector<std::map<std::string, sdbus::Variant>> Repos::list()
 
 std::map<std::string, sdbus::Variant> Repos::info(const std::string& id)
 {
+    Context ctx;
+    ctx.configure();
     std::map<std::string, sdbus::Variant> out;
+    for (auto &repo: ctx.repos) {
+        if (repo->getId() == id) {
+            out.emplace(std::make_pair(std::string("id"), repo->getId()));
+            break;
+        }
+    }
     return out;
 }
 
