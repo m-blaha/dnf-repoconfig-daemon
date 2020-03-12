@@ -13,14 +13,16 @@
 namespace org {
 namespace rpm {
 namespace dnf {
+namespace v1 {
+namespace conf {
 
-class Repository1_adaptor
+class Repos_adaptor
 {
 public:
-    static constexpr const char* INTERFACE_NAME = "org.rpm.dnf.Repository1";
+    static constexpr const char* INTERFACE_NAME = "org.rpm.dnf.v1.conf.Repos";
 
 protected:
-    Repository1_adaptor(sdbus::IObject& object)
+    Repos_adaptor(sdbus::IObject& object)
         : object_(object)
     {
         object_.registerMethod("list").onInterface(INTERFACE_NAME).withOutputParamNames("repos").implementedAs([this](){ return this->list(); });
@@ -29,7 +31,7 @@ protected:
         object_.registerMethod("disable").onInterface(INTERFACE_NAME).withInputParamNames("ids").withOutputParamNames("disabled_ids").implementedAs([this](const std::vector<std::string>& ids){ return this->disable(ids); });
     }
 
-    ~Repository1_adaptor() = default;
+    ~Repos_adaptor() = default;
 
 private:
     virtual std::vector<std::map<std::string, sdbus::Variant>> list() = 0;
@@ -41,6 +43,6 @@ private:
     sdbus::IObject& object_;
 };
 
-}}} // namespaces
+}}}}} // namespaces
 
 #endif

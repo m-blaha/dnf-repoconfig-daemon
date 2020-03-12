@@ -18,39 +18,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#ifndef DNFDAEMON_REPOSITORY_HPP
+#define DNFDAEMON_REPOSITORY_HPP
+
 #include "server-glue.hpp"
-#include "repository.hpp"
-#include "../repository/context.hpp"
 
 #include <sdbus-c++/sdbus-c++.h>
 
-std::vector<std::map<std::string, sdbus::Variant>> Repository1::list()
+class Repos : public sdbus::AdaptorInterfaces<org::rpm::dnf::v1::conf::Repos_adaptor /*, more adaptor classes if there are more interfaces*/>
 {
-    Context ctx;
-    ctx.configure();
-    std::vector<std::map<std::string, sdbus::Variant>> out;
-    for (auto &repo: ctx.repos) {
-        std::map<std::string, sdbus::Variant> repoitem;
-        repoitem.emplace(std::make_pair(std::string("id"), repo->getId()));
-        out.push_back(repoitem);
+public:
+    Repos(sdbus::IConnection& connection, std::string objectPath)
+        : AdaptorInterfaces(connection, std::move(objectPath))
+    {
+        registerAdaptor();
     }
-    return out;
-}
 
-std::map<std::string, sdbus::Variant> Repository1::info(const std::string& id)
-{
-    std::map<std::string, sdbus::Variant> out;
-    return out;
-}
+    ~Repos()
+    {
+        unregisterAdaptor();
+    }
 
-std::vector<std::string> Repository1::enable(const std::vector<std::string>& ids)
-{
-    std::vector<std::string> out;
-    return out;
-}
+private:
+    std::vector<std::map<std::string, sdbus::Variant>> list() override;
+    std::map<std::string, sdbus::Variant> info(const std::string& id) override;
+    std::vector<std::string> enable(const std::vector<std::string>& ids) override;
+    std::vector<std::string> disable(const std::vector<std::string>& ids) override;
+};
 
-std::vector<std::string> Repository1::disable(const std::vector<std::string>& ids)
-{
-    std::vector<std::string> out;
-    return out;
-}
+#endif

@@ -18,38 +18,39 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "repository/context.hpp"
-#include "dbus/repository.hpp"
+#include "server-glue.hpp"
+#include "repository.hpp"
+#include "../repository/context.hpp"
 
-#include <iostream>
 #include <sdbus-c++/sdbus-c++.h>
 
-
-int xmain(int argc, char **argv)
+std::vector<std::map<std::string, sdbus::Variant>> Repos::list()
 {
     Context ctx;
-
     ctx.configure();
-
-    std::cout << "XXX installonly_limit: " << ctx.cfgMain.installonly_limit().getValue() << std::endl;
-    for (auto &r: ctx.repos) {
-        std::cout << "XXX repo id: " << r->getId() << std::endl;
+    std::vector<std::map<std::string, sdbus::Variant>> out;
+    for (auto &repo: ctx.repos) {
+        std::map<std::string, sdbus::Variant> repoitem;
+        repoitem.emplace(std::make_pair(std::string("id"), repo->getId()));
+        out.push_back(repoitem);
     }
-    return 0;
+    return out;
 }
 
-int main(int argc, char *argv[])
+std::map<std::string, sdbus::Variant> Repos::info(const std::string& id)
 {
-    // Create D-Bus connection to the system bus and requests name on it.
-    const char* serviceName = "org.rpm.dnf.Repository1";
-    auto connection = sdbus::createSystemBusConnection(serviceName);
-
-    // Create concatenator D-Bus object.
-    const char* objectPath = "/org/rpm/dnf/Repository1";
-    Repository1 repository1(*connection, objectPath);
-
-    // Run the loop on the connection.
-    connection->enterEventLoop();
-    return 0;
+    std::map<std::string, sdbus::Variant> out;
+    return out;
 }
 
+std::vector<std::string> Repos::enable(const std::vector<std::string>& ids)
+{
+    std::vector<std::string> out;
+    return out;
+}
+
+std::vector<std::string> Repos::disable(const std::vector<std::string>& ids)
+{
+    std::vector<std::string> out;
+    return out;
+}

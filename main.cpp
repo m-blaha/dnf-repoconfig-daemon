@@ -18,32 +18,38 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef DNFDAEMON_REPOSITORY_HPP
-#define DNFDAEMON_REPOSITORY_HPP
+#include "repository/context.hpp"
+#include "dbus/repository.hpp"
 
-#include "server-glue.hpp"
-
+#include <iostream>
 #include <sdbus-c++/sdbus-c++.h>
 
-class Repository1 : public sdbus::AdaptorInterfaces<org::rpm::dnf::Repository1_adaptor /*, more adaptor classes if there are more interfaces*/>
+
+int xmain(int argc, char **argv)
 {
-public:
-    Repository1(sdbus::IConnection& connection, std::string objectPath)
-        : AdaptorInterfaces(connection, std::move(objectPath))
-    {
-        registerAdaptor();
+    Context ctx;
+
+    ctx.configure();
+
+    std::cout << "XXX installonly_limit: " << ctx.cfgMain.installonly_limit().getValue() << std::endl;
+    for (auto &r: ctx.repos) {
+        std::cout << "XXX repo id: " << r->getId() << std::endl;
     }
+    return 0;
+}
 
-    ~Repository1()
-    {
-        unregisterAdaptor();
-    }
+int main(int argc, char *argv[])
+{
+    // Create D-Bus connection to the system bus and requests name on it.
+    const char* serviceName = "org.rpm.dnf.v1.conf.Repos";
+    auto connection = sdbus::createSystemBusConnection(serviceName);
 
-private:
-    std::vector<std::map<std::string, sdbus::Variant>> list() override;
-    std::map<std::string, sdbus::Variant> info(const std::string& id) override;
-    std::vector<std::string> enable(const std::vector<std::string>& ids) override;
-    std::vector<std::string> disable(const std::vector<std::string>& ids) override;
-};
+    // Create D-Bus object.
+    const char* objectPath = "/org/rpm/dnf/v1/conf/Repos";
+    Repos repos(*connection, objectPath);
 
-#endif
+    // Run the loop on the connection.
+    connection->enterEventLoop();
+    return 0;
+}
+

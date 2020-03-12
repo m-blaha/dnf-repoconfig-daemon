@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 US
 <node xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
     <!--
     -->
-    <interface name="org.rpm.dnf.Repository1">
+    <interface name="org.rpm.dnf.v1.conf.Repos">
         <!--
         List:
         @id: id of the repository

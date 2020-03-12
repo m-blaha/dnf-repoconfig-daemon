@@ -13,19 +13,21 @@
 namespace org {
 namespace rpm {
 namespace dnf {
+namespace v1 {
+namespace conf {
 
-class Repository1_proxy
+class Repos_proxy
 {
 public:
-    static constexpr const char* INTERFACE_NAME = "org.rpm.dnf.Repository1";
+    static constexpr const char* INTERFACE_NAME = "org.rpm.dnf.v1.conf.Repos";
 
 protected:
-    Repository1_proxy(sdbus::IProxy& proxy)
+    Repos_proxy(sdbus::IProxy& proxy)
         : proxy_(proxy)
     {
     }
 
-    ~Repository1_proxy() = default;
+    ~Repos_proxy() = default;
 
 public:
     std::vector<std::map<std::string, sdbus::Variant>> list()
@@ -60,6 +62,6 @@ private:
     sdbus::IProxy& proxy_;
 };
 
-}}} // namespaces
+}}}}} // namespaces
 
 #endif
