@@ -21,27 +21,27 @@
 #ifndef DNFDAEMON_REPOSITORY_HPP
 #define DNFDAEMON_REPOSITORY_HPP
 
-#include "server-glue.hpp"
+#include "repoconf-server-glue.hpp"
 
 #include <sdbus-c++/sdbus-c++.h>
 
-class Repos : public sdbus::AdaptorInterfaces<org::rpm::dnf::v1::conf::Repos_adaptor /*, more adaptor classes if there are more interfaces*/>
+class RepoConf : public sdbus::AdaptorInterfaces<org::rpm::dnf::v1::rpm::RepoConf_adaptor /*, more adaptor classes if there are more interfaces*/>
 {
 public:
-    Repos(sdbus::IConnection& connection, std::string objectPath)
+    RepoConf(sdbus::IConnection& connection, std::string objectPath)
         : AdaptorInterfaces(connection, std::move(objectPath))
     {
         registerAdaptor();
     }
 
-    ~Repos()
+    ~RepoConf()
     {
         unregisterAdaptor();
     }
 
 private:
-    std::vector<std::map<std::string, sdbus::Variant>> list() override;
-    std::map<std::string, sdbus::Variant> info(const std::string& id) override;
+    std::vector<std::map<std::string, sdbus::Variant>> list(const std::vector<std::string>& ids) override;
+    std::map<std::string, sdbus::Variant> get(const std::string& id) override;
     std::vector<std::string> enable(const std::vector<std::string>& ids) override;
     std::vector<std::string> disable(const std::vector<std::string>& ids) override;
 };

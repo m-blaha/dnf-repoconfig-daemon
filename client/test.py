@@ -3,7 +3,12 @@
 import dbus
 
 bus = dbus.SystemBus()
-proxy = bus.get_object('org.rpm.dnf.v1.conf.Repos', '/org/rpm/dnf/v1/conf/Repos')
-iface = dbus.Interface(proxy, dbus_interface='org.rpm.dnf.v1.conf.Repos')
-for repo in iface.list():
+proxy = bus.get_object('org.rpm.dnf.v1.rpm.RepoConf', '/org/rpm/dnf/v1/rpm/RepoConf')
+iface = dbus.Interface(proxy, dbus_interface='org.rpm.dnf.v1.rpm.RepoConf')
+for repo in iface.list([]):
     print(repo['id'])
+
+
+print(iface.get("fedora"))
+
+print(iface.get("fedoras"))

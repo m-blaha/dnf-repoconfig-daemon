@@ -41,12 +41,12 @@ int xmain(int argc, char **argv)
 int main(int argc, char *argv[])
 {
     // Create D-Bus connection to the system bus and requests name on it.
-    const char* serviceName = "org.rpm.dnf.v1.conf.Repos";
+    const char* serviceName = "org.rpm.dnf.v1.rpm.RepoConf";
     auto connection = sdbus::createSystemBusConnection(serviceName);
 
     // Create D-Bus object.
-    const char* objectPath = "/org/rpm/dnf/v1/conf/Repos";
-    Repos repos(*connection, objectPath);
+    const char* objectPath = "/org/rpm/dnf/v1/rpm/RepoConf";
+    RepoConf repo_conf(*connection, objectPath);
 
     // Run the loop on the connection.
     connection->enterEventLoop();

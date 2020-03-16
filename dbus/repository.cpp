@@ -18,46 +18,51 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "server-glue.hpp"
+#include "repoconf-server-glue.hpp"
 #include "repository.hpp"
 #include "../repository/context.hpp"
 
+#include <algorithm>
 #include <sdbus-c++/sdbus-c++.h>
 
-std::vector<std::map<std::string, sdbus::Variant>> Repos::list()
+std::vector<std::map<std::string, sdbus::Variant>> RepoConf::list(const std::vector<std::string>& ids)
 {
     Context ctx;
     ctx.configure();
+
+    bool empty_ids=ids.empty();
     std::vector<std::map<std::string, sdbus::Variant>> out;
     for (auto &repo: ctx.repos) {
-        std::map<std::string, sdbus::Variant> repoitem;
-        repoitem.emplace(std::make_pair(std::string("id"), repo->getId()));
-        out.push_back(repoitem);
-    }
-    return out;
-}
-
-std::map<std::string, sdbus::Variant> Repos::info(const std::string& id)
-{
-    Context ctx;
-    ctx.configure();
-    std::map<std::string, sdbus::Variant> out;
-    for (auto &repo: ctx.repos) {
-        if (repo->getId() == id) {
-            out.emplace(std::make_pair(std::string("id"), repo->getId()));
-            break;
+        std::string repoid=repo->getId();
+        if (empty_ids || std::find(ids.begin(), ids.end(), repoid) != ids.end()) {
+            std::map<std::string, sdbus::Variant> repoitem;
+            repoitem.emplace(std::make_pair(std::string("id"), repoid));
+            out.push_back(repoitem);
         }
     }
     return out;
 }
 
-std::vector<std::string> Repos::enable(const std::vector<std::string>& ids)
+std::map<std::string, sdbus::Variant> RepoConf::get(const std::string& id)
+{
+    std::vector<std::string> ids{id};
+    auto lst=list(std::move(ids));
+    if (lst.empty()) {
+        throw sdbus::Error("org.rpm.dnf.v1.rpm.RepoConf.Error", "Repository not found");
+    } else if (lst.size() > 1) {
+        throw sdbus::Error("org.rpm.dnf.v1.rpm.RepoConf.Error", "Multiple repositories found");
+    } else {
+        return lst[0];
+    }
+}
+
+std::vector<std::string> RepoConf::enable(const std::vector<std::string>& ids)
 {
     std::vector<std::string> out;
     return out;
 }
 
-std::vector<std::string> Repos::disable(const std::vector<std::string>& ids)
+std::vector<std::string> RepoConf::disable(const std::vector<std::string>& ids)
 {
     std::vector<std::string> out;
     return out;
