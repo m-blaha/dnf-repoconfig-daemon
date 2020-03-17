@@ -102,7 +102,11 @@ void Context::readRepoConfigs()
                         }
                     }
                     std::unique_ptr<libdnf::Repo> repo(new libdnf::Repo(section, std::move(cfgRepo)));
-                    repos.push_back(std::move(repo));
+                    std::unique_ptr<RepoInfo> repoinfo(new RepoInfo());
+                    repoinfo->repo = std::move(repo);
+                    repoinfo->filePath = globResult.gl_pathv[i];
+                    repoinfo->parser = repo_parser.get();
+                    repos.push_back(std::move(repoinfo));
                 }
             }
             cfgRepoParsers.push_back(std::move(repo_parser));

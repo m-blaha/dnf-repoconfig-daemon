@@ -25,19 +25,6 @@
 #include <sdbus-c++/sdbus-c++.h>
 
 
-int xmain(int argc, char **argv)
-{
-    Context ctx;
-
-    ctx.configure();
-
-    std::cout << "XXX installonly_limit: " << ctx.cfgMain.installonly_limit().getValue() << std::endl;
-    for (auto &r: ctx.repos) {
-        std::cout << "XXX repo id: " << r->getId() << std::endl;
-    }
-    return 0;
-}
-
 int main(int argc, char *argv[])
 {
     // Create D-Bus connection to the system bus and requests name on it.

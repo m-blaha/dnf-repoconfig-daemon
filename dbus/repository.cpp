@@ -25,6 +25,23 @@
 #include <algorithm>
 #include <sdbus-c++/sdbus-c++.h>
 
+std::map<std::string, sdbus::Variant> repo_to_dbus(const Context::RepoInfo &repo)
+{
+    std::map<std::string, sdbus::Variant> dict;
+    auto repoid = repo.repo->getId();
+    dict.emplace(std::make_pair("id", repoid));
+    for (const auto &section: repo.parser->getData()) {
+        if (section.first == repoid) {
+            for (const auto &line: section.second) {
+                if (line.first[0] != '#') {
+                    dict.emplace(std::make_pair(line.first, line.second));
+                }
+            }
+        }
+    }
+    return dict;
+}
+
 std::vector<std::map<std::string, sdbus::Variant>> RepoConf::list(const std::vector<std::string>& ids)
 {
     Context ctx;
@@ -33,11 +50,9 @@ std::vector<std::map<std::string, sdbus::Variant>> RepoConf::list(const std::vec
     bool empty_ids=ids.empty();
     std::vector<std::map<std::string, sdbus::Variant>> out;
     for (auto &repo: ctx.repos) {
-        std::string repoid=repo->getId();
+        std::string repoid=repo->repo->getId();
         if (empty_ids || std::find(ids.begin(), ids.end(), repoid) != ids.end()) {
-            std::map<std::string, sdbus::Variant> repoitem;
-            repoitem.emplace(std::make_pair(std::string("id"), repoid));
-            out.push_back(repoitem);
+            out.push_back(repo_to_dbus(*repo));
         }
     }
     return out;
@@ -45,8 +60,7 @@ std::vector<std::map<std::string, sdbus::Variant>> RepoConf::list(const std::vec
 
 std::map<std::string, sdbus::Variant> RepoConf::get(const std::string& id)
 {
-    std::vector<std::string> ids{id};
-    auto lst=list(std::move(ids));
+    auto lst=list(std::vector<std::string>{id});
     if (lst.empty()) {
         throw sdbus::Error("org.rpm.dnf.v1.rpm.RepoConf.Error", "Repository not found");
     } else if (lst.size() > 1) {

@@ -30,10 +30,16 @@
 #include <memory>
 #include <vector>
 
+
 class Context {
 public:
+    struct RepoInfo {
+        std::unique_ptr<libdnf::Repo> repo;
+        std::string filePath;
+        libdnf::ConfigParser *parser;
+    };
     libdnf::ConfigMain cfgMain;
-    std::vector<std::unique_ptr<libdnf::Repo>> repos;
+    std::vector<std::unique_ptr<RepoInfo>> repos;
 
     void configure();
 
