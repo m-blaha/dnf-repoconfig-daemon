@@ -104,7 +104,7 @@ void Context::readRepoConfigs()
                     }
                     std::unique_ptr<RepoInfo> repoinfo(new RepoInfo());
                     repoinfo->repoid = std::move(section);
-                    repoinfo->filePath = std::move(filePath);
+                    repoinfo->filePath = std::string(filePath);
                     repoinfo->parser = repo_parser.get();
                     repoinfo->repoconfig = std::move(cfgRepo);
                     repos.push_back(std::move(repoinfo));
