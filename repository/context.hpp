@@ -24,7 +24,6 @@
 #include "libdnf/conf/ConfigMain.hpp"
 #include "libdnf/conf/ConfigParser.hpp"
 #include "libdnf/conf/ConfigRepo.hpp"
-#include "libdnf/repo/Repo.hpp"
 
 #include <map>
 #include <memory>
@@ -34,7 +33,7 @@
 class Context {
 public:
     struct RepoInfo {
-        std::unique_ptr<libdnf::Repo> repo;
+        std::string repoid;
         std::string filePath;
         libdnf::ConfigParser *parser;
     };

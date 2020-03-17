@@ -28,10 +28,9 @@
 std::map<std::string, sdbus::Variant> repo_to_dbus(const Context::RepoInfo &repo)
 {
     std::map<std::string, sdbus::Variant> dict;
-    auto repoid = repo.repo->getId();
-    dict.emplace(std::make_pair("id", repoid));
+    dict.emplace(std::make_pair("id", repo.repoid));
     for (const auto &section: repo.parser->getData()) {
-        if (section.first == repoid) {
+        if (section.first == repo.repoid) {
             for (const auto &line: section.second) {
                 if (line.first[0] != '#') {
                     dict.emplace(std::make_pair(line.first, line.second));
@@ -50,8 +49,7 @@ std::vector<std::map<std::string, sdbus::Variant>> RepoConf::list(const std::vec
     bool empty_ids=ids.empty();
     std::vector<std::map<std::string, sdbus::Variant>> out;
     for (auto &repo: ctx.repos) {
-        std::string repoid=repo->repo->getId();
-        if (empty_ids || std::find(ids.begin(), ids.end(), repoid) != ids.end()) {
+        if (empty_ids || std::find(ids.begin(), ids.end(), repo->repoid) != ids.end()) {
             out.push_back(repo_to_dbus(*repo));
         }
     }

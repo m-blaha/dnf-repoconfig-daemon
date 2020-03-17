@@ -11,10 +11,6 @@ find_package(sdbus-c++ REQUIRED)
 pkg_check_modules(GLIB REQUIRED IMPORTED_TARGET gio-unix-2.0>=2.46.0)
 pkg_check_modules(LIBDNF REQUIRED IMPORTED_TARGET libdnf)
 
-# XXX libdnf/repo/Repo.hpp is not public
-include_directories(BEFORE SYSTEM /home/mblaha/src/libdnf)
-include_directories(BEFORE SYSTEM /home/mblaha/src/libdnf/libdnf)
-
 add_definitions(-DLIBDNF_UNSTABLE_API)
 
 SET(DAEMON_SRCS

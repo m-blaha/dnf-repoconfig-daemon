@@ -101,9 +101,8 @@ void Context::readRepoConfigs()
                                 repo_parser->getSubstitutedValue(section, opt.first));
                         }
                     }
-                    std::unique_ptr<libdnf::Repo> repo(new libdnf::Repo(section, std::move(cfgRepo)));
                     std::unique_ptr<RepoInfo> repoinfo(new RepoInfo());
-                    repoinfo->repo = std::move(repo);
+                    repoinfo->repoid = std::move(section);
                     repoinfo->filePath = globResult.gl_pathv[i];
                     repoinfo->parser = repo_parser.get();
                     repos.push_back(std::move(repoinfo));
