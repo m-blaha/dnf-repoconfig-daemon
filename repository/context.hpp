@@ -36,6 +36,7 @@ public:
         std::string repoid;
         std::string filePath;
         libdnf::ConfigParser *parser;
+        std::unique_ptr<libdnf::ConfigRepo> repoconfig;
     };
     libdnf::ConfigMain cfgMain;
     std::vector<std::unique_ptr<RepoInfo>> repos;

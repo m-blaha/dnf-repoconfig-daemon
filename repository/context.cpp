@@ -82,8 +82,9 @@ void Context::readRepoConfigs()
         glob(pattern.c_str(), GLOB_MARK, NULL, &globResult);
         for (size_t i = 0; i < globResult.gl_pathc; ++i) {
             std::unique_ptr<libdnf::ConfigParser> repo_parser(new libdnf::ConfigParser);
+            std::string filePath=globResult.gl_pathv[i];
             repo_parser->setSubstitutions(substitutions);
-            repo_parser->read(globResult.gl_pathv[i]);
+            repo_parser->read(filePath);
             const auto & cfgParserData = repo_parser->getData();
             for (const auto & cfgParserDataIter : cfgParserData) {
                 if (cfgParserDataIter.first != "main") {
@@ -103,8 +104,9 @@ void Context::readRepoConfigs()
                     }
                     std::unique_ptr<RepoInfo> repoinfo(new RepoInfo());
                     repoinfo->repoid = std::move(section);
-                    repoinfo->filePath = globResult.gl_pathv[i];
+                    repoinfo->filePath = std::move(filePath);
                     repoinfo->parser = repo_parser.get();
+                    repoinfo->repoconfig = std::move(cfgRepo);
                     repos.push_back(std::move(repoinfo));
                 }
             }
