@@ -84,8 +84,11 @@ std::vector<std::string> enable_disable_repos(const std::vector<std::string> &id
         }
     }
     for (auto &config_file: changed_config_files) {
-        // TODO try / catch and return proper dbus error
-        cfg.findParser(config_file)->write(config_file, false);
+        try {
+            cfg.findParser(config_file)->write(config_file, false);
+        } catch (std::exception &e) {
+            throw sdbus::Error("org.rpm.dnf.v1.rpm.RepoConf.Error", std::string("Unable to write configuration file: ") + e.what());
+        }
     }
 
     return out;
