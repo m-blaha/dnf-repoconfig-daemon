@@ -25,32 +25,28 @@
 #include <algorithm>
 #include <sdbus-c++/sdbus-c++.h>
 
-std::map<std::string, sdbus::Variant> repo_to_dbus(const Context::RepoInfo &repo)
-{
-    std::map<std::string, sdbus::Variant> dict;
-    dict.emplace(std::make_pair("id", repo.repoid));
-    for (const auto &section: repo.parser->getData()) {
-        if (section.first == repo.repoid) {
-            for (const auto &line: section.second) {
-                if (line.first[0] != '#') {
-                    dict.emplace(std::make_pair(line.first, line.second));
-                }
-            }
-        }
-    }
-    return dict;
-}
 
 std::vector<std::map<std::string, sdbus::Variant>> RepoConf::list(const std::vector<std::string>& ids)
 {
     Context ctx;
     ctx.configure();
-
     bool empty_ids=ids.empty();
     std::vector<std::map<std::string, sdbus::Variant>> out;
     for (auto &repo: ctx.repos) {
-        if (empty_ids || std::find(ids.begin(), ids.end(), repo->repoid) != ids.end()) {
-            out.push_back(repo_to_dbus(*repo));
+        if (empty_ids || std::find(ids.begin(), ids.end(), repo.first) != ids.end()) {
+            auto parser = ctx.configFiles.find(repo.second->filePath)->second.get();
+            std::map<std::string, sdbus::Variant> dbus_repo;
+            dbus_repo.emplace(std::make_pair("repoid", repo.first));
+            for (const auto &section: parser->getData()) {
+                if (section.first == repo.first) {
+                    for (const auto &line: section.second) {
+                        if (line.first[0] != '#') {
+                            dbus_repo.emplace(std::make_pair(line.first, line.second));
+                        }
+                    }
+                }
+            }
+            out.push_back(dbus_repo);
         }
     }
     return out;
@@ -71,17 +67,22 @@ std::map<std::string, sdbus::Variant> RepoConf::get(const std::string& id)
 std::vector<std::string> enable_disable_repos(const std::vector<std::string> &ids, bool enable) {
     Context ctx;
     ctx.configure();
-
     std::vector<std::string> out;
-    for (auto &repoinfo: ctx.repos) {
-        if (std::find(ids.begin(), ids.end(), repoinfo->repoid) != ids.end()
-            && repoinfo->repoconfig->enabled().getValue()!=enable) {
-            repoinfo->parser->setValue(repoinfo->repoid, "enabled", enable ? "1" : "0");
-            // try / catch and return proper dbus error
-            repoinfo->parser->write(repoinfo->filePath, false);
-            out.push_back(repoinfo->repoid);
+    std::vector<std::string> changed_config_files;
+
+    for (auto &repoid: ids) {
+        auto &repoinfo=ctx.repos[repoid];
+        if (repoinfo->repoconfig->enabled().getValue() != enable) {
+            ctx.configFiles[repoinfo->filePath]->setValue(repoid, "enabled", enable ? "1" : "0");
+            changed_config_files.push_back(repoinfo->filePath);
+            out.push_back(repoid);
         }
     }
+    for (auto &config_file: changed_config_files) {
+        // try / catch and return proper dbus error
+        ctx.configFiles[config_file]->write(config_file, false);
+    }
+
     return out;
 }
 

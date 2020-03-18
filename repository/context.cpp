@@ -103,14 +103,12 @@ void Context::readRepoConfigs()
                         }
                     }
                     std::unique_ptr<RepoInfo> repoinfo(new RepoInfo());
-                    repoinfo->repoid = std::move(section);
                     repoinfo->filePath = std::string(filePath);
-                    repoinfo->parser = repo_parser.get();
                     repoinfo->repoconfig = std::move(cfgRepo);
-                    repos.push_back(std::move(repoinfo));
+                    repos[std::move(section)] = std::move(repoinfo);
                 }
             }
-            cfgRepoParsers.push_back(std::move(repo_parser));
+            configFiles[std::string(filePath)] = std::move(repo_parser);
         }
         globfree(&globResult);
     }

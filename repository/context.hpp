@@ -33,19 +33,21 @@
 class Context {
 public:
     struct RepoInfo {
-        std::string repoid;
         std::string filePath;
-        libdnf::ConfigParser *parser;
         std::unique_ptr<libdnf::ConfigRepo> repoconfig;
     };
     libdnf::ConfigMain cfgMain;
-    std::vector<std::unique_ptr<RepoInfo>> repos;
+
+    // repoid: repoinfo
+    std::map<std::string, std::unique_ptr<RepoInfo>> repos;
+    // repo_config_file_path: parser
+    std::map<std::string, std::unique_ptr<libdnf::ConfigParser>> configFiles;
 
     void configure();
 
 private:
     libdnf::ConfigParser cfgMainParser;
-    std::vector<std::unique_ptr<libdnf::ConfigParser>> cfgRepoParsers;
+
     std::map<std::string, std::string> substitutions;
     static bool libRpmInitiated;
 
