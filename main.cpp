@@ -18,8 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "repository/context.hpp"
-#include "dbus/repository.hpp"
+#include "repoconf/repoconf.hpp"
 
 #include <iostream>
 #include <sdbus-c++/sdbus-c++.h>

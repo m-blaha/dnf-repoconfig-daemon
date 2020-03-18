@@ -18,8 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef DNFDAEMON_REPOSITORY_HPP
-#define DNFDAEMON_REPOSITORY_HPP
+#ifndef DNFDAEMON_REPOCONF_HPP
+#define DNFDAEMON_REPOCONF_HPP
 
 #include "repoconf-server-glue.hpp"
 

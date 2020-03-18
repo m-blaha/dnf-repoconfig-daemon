@@ -17,8 +17,7 @@ SET(DAEMON_SRCS
     main.cpp
 )
 
-add_subdirectory(repository)
-add_subdirectory(dbus)
+add_subdirectory(repoconf)
 
 add_executable(daemontest ${DAEMON_SRCS})
 

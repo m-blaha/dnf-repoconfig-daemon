@@ -19,8 +19,8 @@
  */
 
 #include "repoconf-server-glue.hpp"
-#include "repository.hpp"
-#include "../repository/context.hpp"
+#include "repoconf.hpp"
+#include "configuration.hpp"
 
 #include <algorithm>
 #include <sdbus-c++/sdbus-c++.h>
@@ -28,13 +28,13 @@
 
 std::vector<std::map<std::string, sdbus::Variant>> RepoConf::list(const std::vector<std::string>& ids)
 {
-    Context ctx;
-    ctx.read_configuration();
+    Configuration cfg;
+    cfg.read_configuration();
     bool empty_ids=ids.empty();
     std::vector<std::map<std::string, sdbus::Variant>> out;
-    for (auto &repo: ctx.getRepos()) {
+    for (auto &repo: cfg.getRepos()) {
         if (empty_ids || std::find(ids.begin(), ids.end(), repo.first) != ids.end()) {
-            auto parser = ctx.findParser(repo.second->filePath);
+            auto parser = cfg.findParser(repo.second->filePath);
             if (parser) {
                 std::map<std::string, sdbus::Variant> dbus_repo;
                 dbus_repo.emplace(std::make_pair("repoid", repo.first));
@@ -67,15 +67,15 @@ std::map<std::string, sdbus::Variant> RepoConf::get(const std::string& id)
 }
 
 std::vector<std::string> enable_disable_repos(const std::vector<std::string> &ids, bool enable) {
-    Context ctx;
-    ctx.read_configuration();
+    Configuration cfg;
+    cfg.read_configuration();
     std::vector<std::string> out;
     std::vector<std::string> changed_config_files;
 
     for (auto &repoid: ids) {
-        auto repoinfo=ctx.findRepo(repoid);
+        auto repoinfo=cfg.findRepo(repoid);
         if (repoinfo && repoinfo->repoconfig->enabled().getValue() != enable) {
-            auto parser=ctx.findParser(repoinfo->filePath);
+            auto parser=cfg.findParser(repoinfo->filePath);
             if (parser) {
                 parser->setValue(repoid, "enabled", enable ? "1" : "0");
                 changed_config_files.push_back(repoinfo->filePath);
@@ -85,7 +85,7 @@ std::vector<std::string> enable_disable_repos(const std::vector<std::string> &id
     }
     for (auto &config_file: changed_config_files) {
         // TODO try / catch and return proper dbus error
-        ctx.findParser(config_file)->write(config_file, false);
+        cfg.findParser(config_file)->write(config_file, false);
     }
 
     return out;

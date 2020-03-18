@@ -18,8 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef DNFDAEMON_CONTEXT_HPP
-#define DNFDAEMON_CONTEXT_HPP
+#ifndef DNFDAEMON_CONFIGURATION_HPP
+#define DNFDAEMON_CONFIGURATION_HPP
 
 #include "libdnf/conf/ConfigMain.hpp"
 #include "libdnf/conf/ConfigParser.hpp"
@@ -30,7 +30,7 @@
 #include <vector>
 
 
-class Context {
+class Configuration {
 public:
     struct RepoInfo {
         std::string filePath;

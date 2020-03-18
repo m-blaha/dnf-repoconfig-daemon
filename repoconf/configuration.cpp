@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "context.hpp"
+#include "configuration.hpp"
 
 #include "libdnf/conf/ConfigMain.hpp"
 #include "libdnf/conf/ConfigParser.hpp"
@@ -29,16 +29,16 @@
 #include <iostream>
 #include <rpm/rpmlib.h>
 
-bool Context::libRpmInitiated = false;
+bool Configuration::libRpmInitiated = false;
 
-void Context::read_configuration()
+void Configuration::read_configuration()
 {
     setSubstitutions();
     readMainConfig();
     readRepoConfigs();
 }
 
-void Context::setSubstitutions()
+void Configuration::setSubstitutions()
 {
     if (!libRpmInitiated) {
         if (rpmReadConfigFiles(NULL, NULL) != 0) {
@@ -55,7 +55,7 @@ void Context::setSubstitutions()
     substitutions["releasever"] = "31";
 }
 
-void Context::readMainConfig()
+void Configuration::readMainConfig()
 {
     cfgMainParser.setSubstitutions(substitutions);
     cfgMainParser.read(cfgMain.config_file_path().getValue());
@@ -74,7 +74,7 @@ void Context::readMainConfig()
     }
 }
 
-void Context::readRepoConfigs()
+void Configuration::readRepoConfigs()
 {
     for (auto reposDir : cfgMain.reposdir().getValue()) {
         const std::string pattern = reposDir + "/*.repo";
@@ -114,7 +114,7 @@ void Context::readRepoConfigs()
     }
 }
 
-Context::RepoInfo* Context::findRepo(const std::string &repoid) {
+Configuration::RepoInfo* Configuration::findRepo(const std::string &repoid) {
     auto repo_iter=repos.find(repoid);
     if (repo_iter == repos.end()) {
         return NULL;
@@ -122,7 +122,7 @@ Context::RepoInfo* Context::findRepo(const std::string &repoid) {
     return repo_iter->second.get();
 }
 
-libdnf::ConfigParser* Context::findParser(const std::string &filepath) {
+libdnf::ConfigParser* Configuration::findParser(const std::string &filepath) {
     auto parser_iter=configFiles.find(filepath);
     if (parser_iter == configFiles.end()) {
         return NULL;
