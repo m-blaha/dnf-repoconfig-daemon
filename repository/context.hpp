@@ -38,15 +38,17 @@ public:
     };
     libdnf::ConfigMain cfgMain;
 
+    void read_configuration();
+    const std::map<std::string, std::unique_ptr<RepoInfo>> &getRepos() {return repos;}
+    RepoInfo* findRepo(const std::string &repoid);
+    libdnf::ConfigParser* findParser(const std::string &filepath);
+
+private:
+    libdnf::ConfigParser cfgMainParser;
     // repoid: repoinfo
     std::map<std::string, std::unique_ptr<RepoInfo>> repos;
     // repo_config_file_path: parser
     std::map<std::string, std::unique_ptr<libdnf::ConfigParser>> configFiles;
-
-    void configure();
-
-private:
-    libdnf::ConfigParser cfgMainParser;
 
     std::map<std::string, std::string> substitutions;
     static bool libRpmInitiated;

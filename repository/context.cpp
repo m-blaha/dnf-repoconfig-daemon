@@ -31,7 +31,7 @@
 
 bool Context::libRpmInitiated = false;
 
-void Context::configure()
+void Context::read_configuration()
 {
     setSubstitutions();
     readMainConfig();
@@ -112,4 +112,20 @@ void Context::readRepoConfigs()
         }
         globfree(&globResult);
     }
+}
+
+Context::RepoInfo* Context::findRepo(const std::string &repoid) {
+    auto repo_iter=repos.find(repoid);
+    if (repo_iter == repos.end()) {
+        return NULL;
+    }
+    return repo_iter->second.get();
+}
+
+libdnf::ConfigParser* Context::findParser(const std::string &filepath) {
+    auto parser_iter=configFiles.find(filepath);
+    if (parser_iter == configFiles.end()) {
+        return NULL;
+    }
+    return parser_iter->second.get();
 }
