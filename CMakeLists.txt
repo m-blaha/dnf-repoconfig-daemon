@@ -5,6 +5,8 @@ project(daemontest CXX C)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(SYSCONFDIR /etc)
+
 find_package(PkgConfig REQUIRED)
 find_package(sdbus-c++ REQUIRED)
 
@@ -18,15 +20,16 @@ SET(DAEMON_SRCS
 )
 
 add_subdirectory(repoconf)
+add_subdirectory(dbus)
 
-add_executable(daemontest ${DAEMON_SRCS})
+add_executable(dnf-repoconfig-daemon ${DAEMON_SRCS})
 
 target_link_libraries(
-    daemontest
+    dnf-repoconfig-daemon
     PRIVATE
         sdbus-c++
         PkgConfig::GLIB
         PkgConfig::LIBDNF
 )
 
-install(TARGETS daemontest RUNTIME DESTINATION bin)
+install(TARGETS dnf-repoconfig-daemon RUNTIME DESTINATION bin)
