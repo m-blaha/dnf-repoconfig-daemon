@@ -21,6 +21,7 @@ SET(DAEMON_SRCS
 
 add_subdirectory(repoconf)
 add_subdirectory(dbus)
+add_subdirectory(polkit)
 
 add_executable(dnf-repoconfig-daemon ${DAEMON_SRCS})
 
