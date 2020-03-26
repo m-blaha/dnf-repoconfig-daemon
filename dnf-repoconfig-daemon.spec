@@ -27,8 +27,9 @@ Experimental d-bus daemon to list / enable / disable repositories.
 %make_install
 
 %files
-%{_bindir}/%{name}
-%{_unitdir}/dnf-repoconfig-daemon.service
+%{_bindir}/%{name}-server
+%{_bindir}/%{name}-client
+%{_unitdir}/%{name}.service
 %{_sysconfdir}/dbus-1/system.d/org.rpm.dnf.v1.conf
 %{_datadir}/dbus-1/system-services/org.rpm.dnf.v1.rpm.RepoConf.service
 %{_datadir}/polkit-1/actions/org.rpm.dnf.v1.policy

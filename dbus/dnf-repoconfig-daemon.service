@@ -5,4 +5,4 @@ Description=Repository configuration management daemon
 Type=dbus
 BusName=org.rpm.dnf.v1.rpm.RepoConf
 User=root
-ExecStart=/usr/bin/dnf-repoconfig-daemon
+ExecStart=/usr/bin/dnf-repoconfig-daemon-server
