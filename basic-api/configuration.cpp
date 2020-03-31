@@ -57,9 +57,11 @@ void Configuration::setSubstitutions()
 
 void Configuration::readMainConfig()
 {
-    cfgMainParser.setSubstitutions(substitutions);
-    cfgMainParser.read(cfgMain.config_file_path().getValue());
-    const auto & cfgParserData = cfgMainParser.getData();
+    std::unique_ptr<libdnf::ConfigParser> main_parser(new libdnf::ConfigParser);
+    main_parser->setSubstitutions(substitutions);
+    auto main_config_path = cfgMain.config_file_path().getValue();
+    main_parser->read(main_config_path);
+    const auto & cfgParserData = main_parser->getData();
     const auto cfgParserDataIter = cfgParserData.find("main");
     if (cfgParserDataIter != cfgParserData.end()) {
         auto optBinds = cfgMain.optBinds();
@@ -68,8 +70,37 @@ void Configuration::readMainConfig()
             if (optBindsIter != optBinds.end()) {
                 optBindsIter->second.newString(
                     libdnf::Option::Priority::MAINCONFIG,
-                    cfgMainParser.getSubstitutedValue("main", opt.first));
+                    main_parser->getSubstitutedValue("main", opt.first));
             }
+        }
+    }
+    read_repos(main_parser.get(), main_config_path);
+    configFiles[std::move(main_config_path)] = std::move(main_parser);
+}
+
+void Configuration::read_repos(const libdnf::ConfigParser *repo_parser, const std::string &file_path)
+{
+    const auto & cfgParserData = repo_parser->getData();
+    for (const auto & cfgParserDataIter : cfgParserData) {
+        if (cfgParserDataIter.first != "main") {
+            auto section = cfgParserDataIter.first;
+            std::unique_ptr<libdnf::ConfigRepo> cfgRepo(new libdnf::ConfigRepo(cfgMain));
+            auto optBinds = cfgRepo->optBinds();
+            for (const auto &opt : cfgParserDataIter.second) {
+                if (opt.first[0] == '#') {
+                    continue;
+                }
+                const auto optBindsIter = optBinds.find(opt.first);
+                if (optBindsIter != optBinds.end()) {
+                    optBindsIter->second.newString(
+                        libdnf::Option::Priority::REPOCONFIG,
+                        repo_parser->getSubstitutedValue(section, opt.first));
+                }
+            }
+            std::unique_ptr<RepoInfo> repoinfo(new RepoInfo());
+            repoinfo->filePath = std::string(file_path);
+            repoinfo->repoconfig = std::move(cfgRepo);
+            repos[std::move(section)] = std::move(repoinfo);
         }
     }
 }
@@ -85,29 +116,7 @@ void Configuration::readRepoConfigs()
             std::string filePath=globResult.gl_pathv[i];
             repo_parser->setSubstitutions(substitutions);
             repo_parser->read(filePath);
-            const auto & cfgParserData = repo_parser->getData();
-            for (const auto & cfgParserDataIter : cfgParserData) {
-                if (cfgParserDataIter.first != "main") {
-                    auto section = cfgParserDataIter.first;
-                    std::unique_ptr<libdnf::ConfigRepo> cfgRepo(new libdnf::ConfigRepo(cfgMain));
-                    auto optBinds = cfgRepo->optBinds();
-                    for (const auto &opt : cfgParserDataIter.second) {
-                        if (opt.first[0] == '#') {
-                            continue;
-                        }
-                        const auto optBindsIter = optBinds.find(opt.first);
-                        if (optBindsIter != optBinds.end()) {
-                            optBindsIter->second.newString(
-                                libdnf::Option::Priority::REPOCONFIG,
-                                repo_parser->getSubstitutedValue(section, opt.first));
-                        }
-                    }
-                    std::unique_ptr<RepoInfo> repoinfo(new RepoInfo());
-                    repoinfo->filePath = std::string(filePath);
-                    repoinfo->repoconfig = std::move(cfgRepo);
-                    repos[std::move(section)] = std::move(repoinfo);
-                }
-            }
+            read_repos(repo_parser.get(), filePath);
             configFiles[std::string(filePath)] = std::move(repo_parser);
         }
         globfree(&globResult);

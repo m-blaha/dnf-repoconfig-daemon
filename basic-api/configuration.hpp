@@ -44,7 +44,6 @@ public:
     libdnf::ConfigParser* findParser(const std::string &filepath);
 
 private:
-    libdnf::ConfigParser cfgMainParser;
     // repoid: repoinfo
     std::map<std::string, std::unique_ptr<RepoInfo>> repos;
     // repo_config_file_path: parser
@@ -53,6 +52,7 @@ private:
     std::map<std::string, std::string> substitutions;
     static bool libRpmInitiated;
 
+    void read_repos(const libdnf::ConfigParser *repo_parser, const std::string &file_path);
     void setSubstitutions();
     void readMainConfig();
     void readRepoConfigs();
